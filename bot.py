@@ -31,7 +31,7 @@ async def check_subscription(user_id: int) -> bool:
 # === Kino kodlari bazasi ===
 kino_id_lugat = {
     "1234": 4,  # "1234" kodi bo‘yicha @allalaassa kanalidagi 4-chi postdagi video olinadi
-    "5678": 5   # "5678" kodi bo‘yicha @allalaassa kanalidagi 5-chi postdagi video olinadi
+    "5678": 6   # "5678" kodi bo‘yicha @allalaassa kanalidagi 5-chi postdagi video olinadi
 }
 
 # === Kino yuborish funksiyasi ===

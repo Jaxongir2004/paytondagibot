@@ -2,6 +2,7 @@ import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters import Command
+from aiohttp import web
 
 TOKEN = "7630943846:AAHSU1nfcYVftaTlxbADp2L__UGSii2M4lE"
 
@@ -81,11 +82,22 @@ async def handle_movie_request(message: Message):
     else:
         await message.answer("❌ Iltimos, barcha kanallarga obuna bo‘ling!")
 
-# === Botni ishga tushirish ===
+# === Botni ishga tushirish va WebServer sozlash ===
+async def on_start(request):
+    return web.Response(text="Bot ishlayapti!")
+
+# Web-serverni ishga tushirish
+app = web.Application()
+app.router.add_get("/", on_start)
+
+# Botni ishga tushirish
 async def main():
     print("📌 Bot ishga tushdi...")
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
+
+    # Web-serverni 8000 portda ishga tushirish
+    web.run_app(app, host='0.0.0.0', port=8000)
 
 if __name__ == "__main__":
     asyncio.run(main())

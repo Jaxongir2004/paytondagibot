@@ -1,18 +1,15 @@
-# Python bazaviy rasm
-FROM python:3.10-slim
+# Asosiy Python image'ni ishlating
+FROM python:3.9-slim
 
-# Ishchi papkani belgila
+# Loyihani papkaga ko‘chirish
 WORKDIR /app
 
-# Talablarni o‘rnatish
-COPY requirements.txt .
+# Kutubxonalarni o‘rnatish
+COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Kodni nusxalash
+# Bot fayllarini qo‘shish
 COPY . .
 
-# Webhook uchun portni belgilash
-ENV PORT 8080
-
-# Flaskni ishga tushirish
+# Botni ishga tushirish
 CMD ["python", "bot.py"]

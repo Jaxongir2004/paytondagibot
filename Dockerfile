@@ -14,5 +14,5 @@ COPY . .
 # Webhook uchun portni belgilash
 ENV PORT 8080
 
-# Botni ishga tushirish
+# Flaskni ishga tushirish
 CMD ["python", "bot.py"]

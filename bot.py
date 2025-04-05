@@ -1,9 +1,14 @@
 import asyncio
+import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters import Command
+from flask import Flask, request
+import os
 
 TOKEN = "7630943846:AAHSU1nfcYVftaTlxbADp2L__UGSii2M4lE"
+bot = Bot(token=TOKEN)
+dp = Dispatcher(bot=bot)
 
 # ✅ Obunani tekshirish uchun kanallar
 SUBSCRIPTION_CHANNELS = [
@@ -14,8 +19,11 @@ SUBSCRIPTION_CHANNELS = [
 # ✅ Kinolarni olish uchun kanal
 MOVIE_CHANNEL = "@allalaassa"
 
-bot = Bot(token=TOKEN)
-dp = Dispatcher(bot=bot)
+# Kino kodi va ularning xabar ID'lari
+kino_id_lugat = {
+    "1234": 4,  # "1234" kodi bo‘yicha @allalaassa kanalidagi 4-chi postdagi video olinadi
+    "5678": 6   # "5678" kodi bo‘yicha @allalaassa kanalidagi 6-chi postdagi video olinadi
+}
 
 # === Obunani tekshirish ===
 async def check_subscription(user_id: int) -> bool:
@@ -27,12 +35,6 @@ async def check_subscription(user_id: int) -> bool:
         except:
             return False
     return True
-
-# === Kino kodlari bazasi ===
-kino_id_lugat = {
-    "1234": 4,  # "1234" kodi bo‘yicha @allalaassa kanalidagi 4-chi postdagi video olinadi
-    "5678": 6   # "5678" kodi bo‘yicha @allalaassa kanalidagi 6-chi postdagi video olinadi
-}
 
 # === Kino yuborish funksiyasi ===
 async def send_movie(message: Message):
@@ -81,11 +83,17 @@ async def handle_movie_request(message: Message):
     else:
         await message.answer("❌ Iltimos, barcha kanallarga obuna bo‘ling!")
 
-# === Botni ishga tushirish ===
-async def main():
-    print("📌 Bot ishga tushdi...")
-    await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
+# === Webhook uchun Flask endpoint ===
+app = Flask(__name__)
 
-if __name__ == "__main__":
-    asyncio.run(main())
+@app.route(f'/{TOKEN}', methods=['POST'])
+async def webhook():
+    json_str = await request.get_data()
+    update = types.Update.to_object(json_str)
+    await dp.process_update(update)
+    return "OK", 200
+
+# === Webhook uchun asosiy ishga tushirish ===
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 8080)))
